@@ -35,5 +35,5 @@ dependencies {
 
     compileOnly("com.google.guava:guava:23.0")
     compileOnly("org.spongepowered:spongeapi:7.2.0")
-    testCompile("org.spongepowered:spongeapi:7.2.0")
+    testCompileOnly("org.spongepowered:spongeapi:7.2.0")
 }

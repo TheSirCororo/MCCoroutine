@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("com.github.johnrengelman.shadow") version ("2.0.4")
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 publishing {
@@ -30,9 +30,9 @@ dependencies {
     implementation(project(":mccoroutine-bukkit-core"))
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
 
     compileOnly("org.spigotmc:spigot-api:1.16.3-R0.1-SNAPSHOT")
-    testCompile("org.spigotmc:spigot-api:1.16.3-R0.1-SNAPSHOT")
+    testCompileOnly("org.spigotmc:spigot-api:1.16.3-R0.1-SNAPSHOT")
 }

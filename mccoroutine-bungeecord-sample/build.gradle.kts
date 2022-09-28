@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("com.github.johnrengelman.shadow") version ("2.0.4")
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 publishing {
@@ -12,17 +12,15 @@ publishing {
 
 tasks.withType<ShadowJar> {
     dependsOn("jar")
-    classifier = "shadowJar"
-    archiveName = "$baseName-$version.$extension"
+    archiveClassifier.set("shadowJar")
+    archiveFileName.set("${archiveBaseName.get()}-${archiveVersion.get()}.${archiveExtension.get()}")
 
     // Change the output folder of the plugin.
     // destinationDir = File("C:\\temp\\BungeeCord\\plugins")
 }
 
 repositories {
-    maven {
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-    }
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
@@ -34,5 +32,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.9")
 
     compileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
-    testCompile("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
+    testCompileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
 }
