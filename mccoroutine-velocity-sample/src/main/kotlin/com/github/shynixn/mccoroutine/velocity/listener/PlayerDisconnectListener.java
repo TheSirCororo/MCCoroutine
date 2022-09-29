@@ -1,9 +1,12 @@
 package com.github.shynixn.mccoroutine.velocity.listener;
 
 import com.github.shynixn.mccoroutine.velocity.entity.UserData;
+import com.github.shynixn.mccoroutine.velocity.entity.UserData;
 import com.github.shynixn.mccoroutine.velocity.impl.UserDataCache;
+import com.github.shynixn.mccoroutine.velocity.entity.UserData;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.github.shynixn.mccoroutine.velocity.entity.UserData;
 
 import java.util.concurrent.CompletionStage;
 

@@ -1,28 +1,22 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-plugins {
-    id("com.github.johnrengelman.shadow") version ("2.0.4")
-}
-
 publishing {
     publications {
-        (findByName("mavenJava") as MavenPublication).artifact(tasks.findByName("shadowJar")!!)
+        (findByName("mavenJava") as MavenPublication).artifact(tasks.shadowJar)
     }
 }
 
 tasks.withType<ShadowJar> {
     dependsOn("jar")
-    classifier = "shadowJar"
-    archiveName = "$baseName-$version.$extension"
+    archiveClassifier.set("shadowJar")
+    archiveFileName.set("${archiveBaseName.get()}-${archiveVersion.get()}.${archiveExtension.get()}")
 
     // Change the output folder of the plugin.
     //  destinationDir = File("C:\\temp\\Sponge\\Sponge-2825-7.1.6\\mods")
 }
 
 repositories {
-    maven {
-        url = uri("https://repo.spongepowered.org/maven")
-    }
+    maven("https://repo.spongepowered.org/maven")
 }
 
 dependencies {
@@ -30,10 +24,10 @@ dependencies {
     implementation(project(":mccoroutine-sponge-core"))
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.2.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
 
-    compileOnly("com.google.guava:guava:23.0")
-    compileOnly("org.spongepowered:spongeapi:7.2.0")
-    testCompileOnly("org.spongepowered:spongeapi:7.2.0")
+    compileOnly("com.google.guava:guava:31.1-jre")
+    compileOnly("org.spongepowered:spongeapi:9.0.0")
+    testCompileOnly("org.spongepowered:spongeapi:9.0.0")
 }

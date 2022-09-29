@@ -4,26 +4,32 @@ import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
     kotlin("jvm") version "1.7.10"
+    kotlin("kapt") version "1.7.10" apply false
     id("io.codearte.nexus-staging") version "0.30.0"
     id("de.marcphilipp.nexus-publish") version "0.4.0"
     id("org.jetbrains.dokka") version "1.7.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     signing
 }
 
 allprojects {
     apply(plugin = "org.jetbrains.dokka")
-}
+    apply(plugin = "com.github.johnrengelman.shadow")
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-    jcenter()
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
 }
 
 nexusStaging {
     packageGroup = "com.github.shynixn"
-    username = if (project.hasProperty("ossrhUsername")) project.findProperty("ossrhUsername") as? String else System.getenv("SONATYPE_USERNAME") ?: ""
-    password = if (project.hasProperty("ossrhPassword")) project.findProperty("ossrhPassword") as? String else System.getenv("SONATYPE_PASSWORD") ?: ""
+    username =
+        if (project.hasProperty("ossrhUsername")) project.findProperty("ossrhUsername") as? String else System.getenv("SONATYPE_USERNAME")
+            ?: ""
+    password =
+        if (project.hasProperty("ossrhPassword")) project.findProperty("ossrhPassword") as? String else System.getenv("SONATYPE_PASSWORD")
+            ?: ""
     delayBetweenRetriesInMillis = 10000
     numberOfRetries = 100
 }
@@ -93,31 +99,29 @@ subprojects {
     publishing {
         publications {
             register("mavenJava", MavenPublication::class) {
-                {
-                    from(components["java"])
-                    artifact(sourcesJar)
-                    artifact(javadocJar)
-                    pom {
-                        name.set("MCCoroutine")
-                        description.set("MCCoroutine is a library, which adds extensive support for Kotlin Coroutines for Minecraft Server environments.")
-                        url.set("https://github.com/Shynixn/MCCoroutine")
-                        licenses {
-                            license {
-                                name.set("MIT License")
-                                url.set("http://www.opensource.org/licenses/mit-license.php")
-                            }
+                from(components["java"])
+                artifact(sourcesJar)
+                artifact(javadocJar)
+                pom {
+                    name.set("MCCoroutine")
+                    description.set("MCCoroutine is a library, which adds extensive support for Kotlin Coroutines for Minecraft Server environments.")
+                    url.set("https://github.com/Shynixn/MCCoroutine")
+                    licenses {
+                        license {
+                            name.set("MIT License")
+                            url.set("http://www.opensource.org/licenses/mit-license.php")
                         }
-                        developers {
-                            developer {
-                                name.set("Shynixn")
-                                url.set("https://github.com/Shynixn")
-                            }
+                    }
+                    developers {
+                        developer {
+                            name.set("Shynixn")
+                            url.set("https://github.com/Shynixn")
                         }
-                        scm {
-                            connection.set("scm:git:git://github.com/Shynixn/MCCoroutine.git")
-                            developerConnection.set("scm:git:ssh://github.com:Shynixn/MCCoroutine.git")
-                            url.set("http://github.com/Shynixn/MCCoroutine.git/tree/master")
-                        }
+                    }
+                    scm {
+                        connection.set("scm:git:git://github.com/Shynixn/MCCoroutine.git")
+                        developerConnection.set("scm:git:ssh://github.com:Shynixn/MCCoroutine.git")
+                        url.set("http://github.com/Shynixn/MCCoroutine.git/tree/master")
                     }
                 }
             }
@@ -146,19 +150,10 @@ subprojects {
         }
     }
 
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        jcenter()
-    }
-
     dependencies {
-        testCompileOnly("org.jetbrains.kotlin:kotlin-test")
-        testCompileOnly("org.jetbrains.kotlin:kotlin-test-junit")
-        testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.9.1")
-        testCompileOnly("org.mockito:mockito-core:4.8.0")
-
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+        testImplementation(kotlin("kotlin-test"))
+        testImplementation(kotlin("kotlin-test-junit"))
+        testImplementation("org.mockito:mockito-core:4.8.0")
     }
 }
 

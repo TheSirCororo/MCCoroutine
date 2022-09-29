@@ -1,11 +1,9 @@
-package integrationtest
+package helper.integrationtest
 
 import com.github.shynixn.mccoroutine.velocity.SuspendingSimpleCommand
 import com.github.shynixn.mccoroutine.velocity.executesSuspend
 import com.github.shynixn.mccoroutine.velocity.registerSuspend
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
-import com.mojang.brigadier.tree.LiteralCommandNode
 import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.command.SimpleCommand
@@ -14,8 +12,6 @@ import helper.MockedVelocityServer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito

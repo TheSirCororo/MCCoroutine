@@ -1,19 +1,15 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-plugins {
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-}
-
 publishing {
     publications {
-        (findByName("mavenJava") as MavenPublication).artifact(tasks.findByName("shadowJar")!!)
+        (findByName("mavenJava") as MavenPublication).artifact(tasks.shadowJar)
     }
 }
 
 tasks.withType<ShadowJar> {
     dependsOn("jar")
-    classifier = "shadowJar"
-    archiveName = "$baseName-$version.$extension"
+    archiveClassifier.set("shadowJar")
+    archiveFileName.set("${archiveBaseName.get()}-${archiveVersion.get()}.${archiveExtension.get()}")
 
     // Change the output folder of the plugin.
     // destinationDir = File("C:\\temp\\plugins\\")

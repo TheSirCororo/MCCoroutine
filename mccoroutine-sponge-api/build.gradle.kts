@@ -1,11 +1,9 @@
 repositories {
-    maven {
-        url = uri("https://repo.spongepowered.org/maven")
-    }
+    maven("https://repo.spongepowered.org/maven")
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-    compileOnly("org.spongepowered:spongeapi:7.2.0")
-    testCompileOnly("org.spongepowered:spongeapi:7.2.0")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    compileOnly("org.spongepowered:spongeapi:9.0.0")
+    testCompileOnly("org.spongepowered:spongeapi:9.0.0")
 }

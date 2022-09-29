@@ -1,4 +1,4 @@
-package integrationtest
+package helper.integrationtest
 
 import com.github.shynixn.mccoroutine.velocity.launch
 import helper.MockedVelocityServer

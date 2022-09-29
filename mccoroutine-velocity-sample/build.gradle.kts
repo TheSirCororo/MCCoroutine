@@ -1,30 +1,26 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version ("2.0.4")
+    kotlin("kapt") version "1.7.10"
 }
-
-// Required to generate the velocity-plugin.json file.
-apply plugin: 'kotlin-kapt'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 
 repositories {
-    maven{
-        url "https://nexus.velocitypowered.com/repository/maven-public"
-    }
+    maven("https://nexus.velocitypowered.com/repository/maven-public")
 }
 
+tasks {
+    shadowJar {
+        dependsOn("jar")
+        archiveClassifier.set("shadowJar")
+        archiveFileName.set("$baseName-$version.$extension")
 
-shadowJar{
-    dependsOn("jar")
-    classifier = "shadowJar"
-    archiveName = "$baseName-$version.$extension"
-
-    // Change the output folder of the plugin.
-    // destinationDirectory = file("C:\\temp\\Velocity\\plugins")
+        // Change the output folder of the plugin.
+        // destinationDirectory = file("C:\\temp\\Velocity\\plugins")
+    }
 }
 
 dependencies {
