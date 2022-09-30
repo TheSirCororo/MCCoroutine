@@ -2,7 +2,7 @@ package com.github.shynixn.mccoroutine.sponge.impl
 
 import com.github.shynixn.mccoroutine.sponge.CoroutineSession
 import com.github.shynixn.mccoroutine.sponge.MCCoroutine
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 
 class MCCoroutineImpl : MCCoroutine {
     private val items = HashMap<PluginContainer, CoroutineSessionImpl>()

@@ -1,6 +1,6 @@
 package com.github.shynixn.mccoroutine.sponge.sample.commandexecutor
 
-import com.github.shynixn.mccoroutine.sponge.SuspendingCommandElement
+import com.github.shynixn.mccoroutine.sponge.SuspendingCommandParameter
 import com.github.shynixn.mccoroutine.sponge.SuspendingCommandExecutor
 import com.github.shynixn.mccoroutine.sponge.postSuspending
 import com.github.shynixn.mccoroutine.sponge.sample.impl.UserDataCache
@@ -55,8 +55,8 @@ class AdminCommandExecutor(private val userDataCache: UserDataCache, private val
         }
     }
 
-    class SetCommandElement(pluginContainer: PluginContainer, text: Text) :
-        SuspendingCommandElement(pluginContainer, text) {
+    class SetCommandParameter(pluginContainer: PluginContainer, text: Text) :
+        SuspendingCommandParameter(pluginContainer, text) {
         /**
          * Attempt to extract a value for this element from the given arguments.
          * This method is expected to have no side-effects for the source, meaning

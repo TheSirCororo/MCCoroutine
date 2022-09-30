@@ -12,8 +12,10 @@ import com.github.shynixn.mccoroutine.sponge.suspendingExecutor
 import com.google.inject.Inject
 import kotlinx.coroutines.withContext
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.command.Command
+import org.spongepowered.api.command.CommandExecutor
 import org.spongepowered.api.command.args.GenericArguments
-import org.spongepowered.api.command.spec.CommandSpec
+import org.spongepowered.api.command.parameter.Parameter
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.state.GameStartedServerEvent
 import org.spongepowered.api.plugin.Plugin
@@ -51,17 +53,18 @@ class MCCoroutineSamplePlugin {
         // Extension to traditional registration.
         Sponge.getEventManager().registerSuspendingListeners(plugin, PlayerConnectListener(plugin, cache))
         Sponge.getEventManager().registerSuspendingListeners(plugin, EntityInteractListener(cache))
-        val commandSpec = CommandSpec.builder()
+        val commandSpec = Command.builder()
+            .addParameter(Parameter.subcommand())
             .description(Text.of("Command for operations."))
             .permission("mccoroutine.sample")
             .arguments(
                 GenericArguments.onlyOne(
-                    AdminCommandExecutor.SetCommandElement(plugin, Text.of("action")).toCommandElement()
+                    AdminCommandExecutor.SetCommandParameter(plugin, Text.of("action")).toCommandElement()
                 ),
                 GenericArguments.onlyOne(GenericArguments.player(Text.of("player"))),
                 GenericArguments.onlyOne(GenericArguments.integer(Text.of("kills")))
             )
             .suspendingExecutor(plugin, AdminCommandExecutor(cache, plugin))
-        Sponge.getCommandManager().register(plugin, commandSpec.build(), listOf("mccor"))
+        Sponge.server().commandManager().registrar(CommandExecutor::class.java).get().plugin, commandSpec.build(), listOf("mccor"))
     }
 }

@@ -11,7 +11,7 @@ import kotlin.coroutines.CoroutineContext
 internal val mcCoroutine: MCCoroutine by lazy {
     try {
         Class.forName("com.github.shynixn.mccoroutine.bungeecord.impl.MCCoroutineImpl")
-            .newInstance() as MCCoroutine
+            .getDeclaredConstructor().newInstance() as MCCoroutine
     } catch (e: Exception) {
         throw RuntimeException(
             "Failed to load MCCoroutine implementation. Shade mccoroutine-bungeecord-core into your plugin.",

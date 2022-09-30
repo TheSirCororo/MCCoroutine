@@ -1,10 +1,10 @@
 package com.github.shynixn.mccoroutine.sponge
 
 import kotlinx.coroutines.*
-import org.spongepowered.api.command.spec.CommandSpec
+import org.spongepowered.api.command.Command
 import org.spongepowered.api.event.Event
 import org.spongepowered.api.event.EventManager
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 
@@ -14,7 +14,7 @@ import kotlin.coroutines.CoroutineContext
 internal val mcCoroutine: MCCoroutine by lazy {
     try {
         Class.forName("com.github.shynixn.mccoroutine.sponge.impl.MCCoroutineImpl")
-            .newInstance() as MCCoroutine
+            .getDeclaredConstructor().newInstance() as MCCoroutine
     } catch (e: Exception) {
         throw RuntimeException(
             "Failed to load MCCoroutine implementation. Shade mccoroutine-sponge-core into your plugin.",
@@ -52,12 +52,12 @@ val PluginContainer.scope: CoroutineScope
  * The coroutine is cancelled when the resulting job is [cancelled][Job.cancel].
  *
  * The coroutine context is inherited from a [PluginContainer.scope]. Additional context elements can be specified with [context] argument.
- * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Plugin.minecraftDispatcher] is used.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [PluginContainer.minecraftDispatcher] is used.
  * The parent job is inherited from a [PluginContainer.scope] as well, but it can also be overridden
  * with a corresponding [context] element.
  *
  * By default, the coroutine is immediately scheduled for execution if the current thread is already the minecraft server thread.
- * If the current thread is not the minecraft server thread, the coroutine is moved to the [org.bukkit.scheduler.BukkitScheduler] and executed
+ * If the current thread is not the minecraft server thread, the coroutine is moved to the [org.spongepowered.api.scheduler.Scheduler] and executed
  * in the next server tick schedule.
  * Other start options can be specified via `start` parameter. See [CoroutineStart] for details.
  * An optional [start] parameter can be set to [CoroutineStart.LAZY] to start coroutine _lazily_. In this case,
@@ -67,7 +67,7 @@ val PluginContainer.scope: CoroutineScope
  * Uncaught exceptions in this coroutine do not cancel the parent job or any other child jobs. All uncaught exceptions
  * are logged to a customer logger by default.
  *
- * @param context The coroutine context to start. Should almost be always be [Plugin.minecraftDispatcher]. Async operations should be
+ * @param context The coroutine context to start. Should almost be always be [PluginContainer.minecraftDispatcher]. Async operations should be
  * be created using [withContext] after using the default parameters of this method.
  * @param start coroutine start option. The default value is [CoroutineStart.DEFAULT].
  * @param block the coroutine code which will be invoked in the context of the provided scope.
@@ -90,9 +90,9 @@ fun PluginContainer.launch(
  * possible.
  * Example:
  *
- * class MyPlayerJoinListener : Listener{
- *     @EventHandler
- *     suspend fun onPlayerJoinEvent(event: PlayerJoinEvent) {
+ * class MyPlayerJoinListener {
+ *     @Listener
+ *     suspend fun onPlayerJoinEvent(event: ServerSideConnectionEvent.Join) {
  *
  *     }
  * }
@@ -143,11 +143,13 @@ fun EventManager.postSuspending(
  * Registers an command executor with suspending function.
  * Does exactly the same as PluginCommand.setExecutor.
  */
-fun CommandSpec.Builder.suspendingExecutor(
+fun Command.Builder.suspendingExecutor(
+    alias: String,
     plugin: PluginContainer,
     suspendingCommandExecutor: SuspendingCommandExecutor
-): CommandSpec.Builder {
+): Command.Builder {
     mcCoroutine.getCoroutineSession(plugin).registerSuspendCommandExecutor(
+        alias,
         this,
         suspendingCommandExecutor
     )

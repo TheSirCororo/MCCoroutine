@@ -5,7 +5,6 @@ import com.github.shynixn.mccoroutine.sponge.asyncDispatcher
 import com.github.shynixn.mccoroutine.sponge.minecraftDispatcher
 import com.github.shynixn.mccoroutine.sponge.extension.invokeSuspend
 import com.github.shynixn.mccoroutine.sponge.launch
-import com.google.common.reflect.TypeToken
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -13,23 +12,51 @@ import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.Event
 import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.event.Listener
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.api.event.Order
+import org.spongepowered.plugin.PluginContainer
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 import java.util.logging.Level
 import java.util.logging.Logger
 
+private val spongeEventManagerClazz: Class<*> = Class.forName("org.spongepowered.common.event.manager.SpongeEventManager")
+private val registeredListenersField: Field = spongeEventManagerClazz.getDeclaredField("registeredListeners").apply {
+    isAccessible = true
+}
+private val registerHandleMethod: Method = spongeEventManagerClazz.getDeclaredMethod("register", List::class.java).apply {
+    isAccessible = true
+}
+private val handlerCacheMethod: Method = spongeEventManagerClazz.getDeclaredMethod("getHandlerCache", Event::class.java).apply {
+    isAccessible = true
+}
+private val listenerClazz: Class<*> = Class.forName("org.spongepowered.common.event.manager.RegisteredListener")
+private val listenerField: Field = listenerClazz.getDeclaredField("listener").apply {
+    isAccessible = true
+}
+private val cacheAccess: Class<*> = Class.forName("org.spongepowered.common.event.manager.RegisteredListener\$Cache")
+private val cacheGetListenersMethod: Method = cacheAccess.getDeclaredMethod("getListeners")
+private val createRegistrationMethod =
+    spongeEventManagerClazz.getDeclaredMethod(
+        "createRegistration",
+        PluginContainer::class.java,
+        Type::class.java,
+        Order::class.java,
+        Boolean::class.java,
+        EventListener::class.java
+    ).apply {
+        isAccessible = true
+    }
+
 internal class EventServiceImpl(private val plugin: PluginContainer, private val logger: Logger) {
     /**
      * Registers a suspend listener.
      */
+    @Suppress("UNCHECKED_CAST")
     fun registerSuspendListener(listener: Any) {
-        val spongeEventManagerClazz = Class.forName("org.spongepowered.common.event.SpongeEventManager")
-        val registeredListenersField = spongeEventManagerClazz.getDeclaredField("registeredListeners")
-        registeredListenersField.isAccessible = true
-        val registeredListeners = registeredListenersField.get(Sponge.getEventManager()) as MutableSet<Any>
+        val registeredListeners = registeredListenersField.get(Sponge.eventManager()) as MutableSet<Any>
 
         if (registeredListeners.contains(listener)) {
             try {
@@ -42,7 +69,7 @@ internal class EventServiceImpl(private val plugin: PluginContainer, private val
                 if (!data.contains("com.github.shynixn.mccoroutine.sponge.SuspendingPluginContainer.onGameInitializeEvent")) {
                     this.logger.log(
                         Level.SEVERE,
-                        "Plugin ${plugin.id} attempted to register an already registered listener ({${listener::class.java.name}})"
+                        "Plugin ${plugin.metadata().id()} attempted to register an already registered listener ({${listener::class.java.name}})"
                     )
 
                     Thread.dumpStack()
@@ -53,40 +80,12 @@ internal class EventServiceImpl(private val plugin: PluginContainer, private val
             }
         }
 
-        var typeToken = false
-        val createRegistrationMethod = try {
-            spongeEventManagerClazz.getDeclaredMethod(
-                "createRegistration",
-                PluginContainer::class.java,
-                Type::class.java,
-                Listener::class.java,
-                EventListener::class.java
-            )
-        } catch (e: Exception) {
-            // Older Sponge version use guava type token.
-            typeToken = true
-            spongeEventManagerClazz.getDeclaredMethod(
-                "createRegistration",
-                PluginContainer::class.java,
-                TypeToken::class.java,
-                Listener::class.java,
-                EventListener::class.java
-            )
-        }
-
-        createRegistrationMethod.isAccessible = true
-
         val handlers = ArrayList<Any>()
 
-        for (method in listener::class.java.methods) {
+        for (method in listener.javaClass.methods) {
             val listenerAnnotation = method.getAnnotation(Listener::class.java) ?: continue
 
-            val eventType: Any = if (!typeToken) {
-                method.genericParameterTypes[0]
-            } else {
-                // Older Sponge version use guava type token.
-                TypeToken.of(method.genericParameterTypes[0])
-            }
+            val eventType: Any = method.genericParameterTypes[0]
 
             try {
                 // Using the AnnotatedEventListener.Factory will not work because of Filter annotations.
@@ -94,10 +93,11 @@ internal class EventServiceImpl(private val plugin: PluginContainer, private val
                 val handler = MCCoroutineEventListener(listener, method, plugin)
 
                 val registration = createRegistrationMethod.invoke(
-                    Sponge.getEventManager(),
+                    Sponge.eventManager(),
                     plugin,
                     eventType,
-                    listenerAnnotation,
+                    listenerAnnotation.order,
+                    listenerAnnotation.beforeModifications,
                     handler
                 )
                 handlers.add(registration)
@@ -107,9 +107,7 @@ internal class EventServiceImpl(private val plugin: PluginContainer, private val
         }
 
         registeredListeners.add(listener)
-        val registerHandleMethod = spongeEventManagerClazz.getDeclaredMethod("register", List::class.java)
-        registerHandleMethod.isAccessible = true
-        registerHandleMethod.invoke(Sponge.getEventManager(), handlers)
+        registerHandleMethod.invoke(Sponge.eventManager(), handlers)
     }
 
     /**
@@ -117,20 +115,9 @@ internal class EventServiceImpl(private val plugin: PluginContainer, private val
      * @return Collection of receiver jobs. May already be completed.
      */
     fun fireSuspendingEvent(event: Event, eventExecutionType: EventExecutionType): Collection<Job> {
-        val spongeEventManagerClazz = Class.forName("org.spongepowered.common.event.SpongeEventManager")
-        val method = spongeEventManagerClazz.getDeclaredMethod("getHandlerCache", Event::class.java)
-        method.isAccessible = true
-        val listenerCache = method.invoke(Sponge.getEventManager(), event)
-
-        val cacheAccess = Class.forName("org.spongepowered.common.event.RegisteredListener\$Cache")
-        val listeners = cacheAccess.getDeclaredMethod("getListeners").invoke(listenerCache) as List<Any>
-
+        val listenerCache = handlerCacheMethod.invoke(Sponge.eventManager(), event)
+        val listeners = cacheGetListenersMethod.invoke(listenerCache) as List<Any>
         val jobs = ArrayList<Job>()
-
-        val listerClazz = Class.forName("org.spongepowered.common.event.RegisteredListener")
-        val listenerField = listerClazz.getDeclaredField("listener")
-        listenerField.isAccessible = true
-
         if (eventExecutionType == EventExecutionType.Concurrent) {
             for (listener in listeners) {
                 val eventListener = listenerField.get(listener) as EventListener<Event>
@@ -145,7 +132,7 @@ internal class EventServiceImpl(private val plugin: PluginContainer, private val
                 } catch (e: Throwable) {
                     this.logger.log(
                         Level.SEVERE,
-                        "Could not pass {${event.javaClass.simpleName}} to {${plugin.name}}.", e
+                        "Could not pass {${event.javaClass.simpleName}} to {${plugin.metadata().name().get()}}.", e
                     )
                 }
             }
@@ -163,7 +150,7 @@ internal class EventServiceImpl(private val plugin: PluginContainer, private val
                     } catch (e: Throwable) {
                         logger.log(
                             Level.SEVERE,
-                            "Could not pass {${event.javaClass.simpleName}} to {${plugin.name}}.", e
+                            "Could not pass {${event.javaClass.simpleName}} to {${plugin.metadata().name()}}.", e
                         )
                     }
                 }
@@ -207,7 +194,7 @@ internal class EventServiceImpl(private val plugin: PluginContainer, private val
          * @throws Exception If an error occurs
          */
         private fun handleEvent(event: Event): Job {
-            val dispatcher = if (!Sponge.getServer().isMainThread) {
+            val dispatcher = if (!Sponge.server().onMainThread()) {
                 // Unconfined because async events should be supported too.
                 plugin.asyncDispatcher
             } else {

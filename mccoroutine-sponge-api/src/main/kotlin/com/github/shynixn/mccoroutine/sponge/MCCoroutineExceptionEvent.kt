@@ -1,10 +1,10 @@
 package com.github.shynixn.mccoroutine.sponge
 
 import org.spongepowered.api.event.Cancellable
-import org.spongepowered.api.event.cause.Cause
-import org.spongepowered.api.event.cause.EventContext
+import org.spongepowered.api.event.Cause
+import org.spongepowered.api.event.EventContext
 import org.spongepowered.api.event.impl.AbstractEvent
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 
 /**
  * A sponge event which is called when an exception is raised in one of the coroutines managed by MCCoroutine.
@@ -50,7 +50,7 @@ class MCCoroutineExceptionEvent(
      *
      * @return The cause
      */
-    override fun getCause(): Cause {
+    override fun cause(): Cause {
         return Cause.builder().append(exception).build(EventContext.empty())
     }
 }

@@ -10,30 +10,17 @@ import org.slf4j.Logger
  * Calling initialize allows to listen to suspend events in your plugin main class.
  */
 @Suppress("ConvertSecondaryConstructorToPrimary")
-class SuspendingPluginContainer {
-    /**
-     * Gets the proxy server.
-     */
-    val server: ProxyServer
-
-    /**
-     * Gets the logger.
-     */
+class SuspendingPluginContainer
+@Inject constructor(
+    val pluginContainer: PluginContainer,
+    val server: ProxyServer,
     val logger: Logger
-
-    /**
-     * PluginContainer.
-     */
-    val pluginContainer: PluginContainer
+) {
 
     /**
      * Initializes the MCCoroutine hook into the plugin.
      */
-    @Inject
-    constructor(pluginContainer: PluginContainer, server: ProxyServer, logger: Logger) {
-        this.server = server
-        this.logger = logger
-        this.pluginContainer = pluginContainer
+    init {
         mcCoroutine.disableLogging(pluginContainer, this)
     }
 

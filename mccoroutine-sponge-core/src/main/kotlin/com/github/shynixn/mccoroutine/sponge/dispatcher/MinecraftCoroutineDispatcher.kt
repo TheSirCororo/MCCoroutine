@@ -1,10 +1,11 @@
 package com.github.shynixn.mccoroutine.sponge.dispatcher
 
 import com.github.shynixn.mccoroutine.sponge.extension.isEnabled
+import com.github.shynixn.mccoroutine.sponge.extension.submit
 import kotlinx.coroutines.CoroutineDispatcher
 import org.spongepowered.api.Sponge
-import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.scheduler.Task
+import org.spongepowered.plugin.PluginContainer
 import kotlin.coroutines.CoroutineContext
 
 internal class MinecraftCoroutineDispatcher(private val plugin: PluginContainer) :
@@ -16,7 +17,7 @@ internal class MinecraftCoroutineDispatcher(private val plugin: PluginContainer)
      * may leave the coroutines that use this dispatcher in the inconsistent and hard to debug state.
      */
     override fun isDispatchNeeded(context: CoroutineContext): Boolean {
-        return !Sponge.getServer().isMainThread
+        return !Sponge.server().onMainThread()
     }
 
     /**

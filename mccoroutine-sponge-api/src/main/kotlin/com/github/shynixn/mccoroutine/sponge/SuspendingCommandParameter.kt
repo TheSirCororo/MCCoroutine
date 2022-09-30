@@ -1,15 +1,17 @@
 package com.github.shynixn.mccoroutine.sponge
 
+import net.kyori.adventure.text.Component
 import org.spongepowered.api.command.CommandSource
-import org.spongepowered.api.command.args.ArgumentParseException
 import org.spongepowered.api.command.args.CommandArgs
-import org.spongepowered.api.command.args.CommandContext
 import org.spongepowered.api.command.args.CommandElement
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.api.command.exception.ArgumentParseException
+import org.spongepowered.api.command.parameter.CommandContext
+import org.spongepowered.api.command.parameter.Parameter
 import org.spongepowered.api.text.Text
+import org.spongepowered.plugin.PluginContainer
 
-abstract class SuspendingCommandElement(pluginContainer: PluginContainer, text: Text) {
-    private val commandElement = object : CommandElement(text) {
+abstract class SuspendingCommandParameter(pluginContainer: PluginContainer, text: Component) {
+    private val commandElement = object : Parameter.Subcommand {
         /**
          * Attempt to extract a value for this element from the given arguments.
          * This method is expected to have no side-effects for the source, meaning
@@ -29,7 +31,7 @@ abstract class SuspendingCommandElement(pluginContainer: PluginContainer, text: 
 
             pluginContainer.launch {
                 try {
-                    parsedValue = this@SuspendingCommandElement.parseValue(source, args)
+                    parsedValue = this@SuspendingCommandParameter.parseValue(source, args)
                 } catch (e: Throwable) {
                     exception = e
                 }
@@ -58,7 +60,7 @@ abstract class SuspendingCommandElement(pluginContainer: PluginContainer, text: 
 
             pluginContainer.launch {
                 try {
-                    parsedValue = this@SuspendingCommandElement.complete(src, args, context)
+                    parsedValue = this@SuspendingCommandParameter.complete(src, args, context)
                 } catch (e: Throwable) {
                     exception = e
                 }
@@ -73,7 +75,7 @@ abstract class SuspendingCommandElement(pluginContainer: PluginContainer, text: 
     }
 
     /**
-     * Converts this [SuspendingCommandElement] to a Sponge-Api compatible [CommandElement].
+     * Converts this [SuspendingCommandParameter] to a Sponge-Api compatible [CommandElement].
      */
     fun toCommandElement(): CommandElement {
         return commandElement
@@ -140,7 +142,7 @@ abstract class SuspendingCommandElement(pluginContainer: PluginContainer, text: 
      * @param context The context to store state in
      * @return Any relevant completions
      */
-    abstract suspend fun complete(src: CommandSource, args: CommandArgs, context: CommandContext): List<String?>?
+    abstract suspend fun complete(ctx: CommandContext): List<String?>?
 
     /**
      * Return a usage message for this specific argument.

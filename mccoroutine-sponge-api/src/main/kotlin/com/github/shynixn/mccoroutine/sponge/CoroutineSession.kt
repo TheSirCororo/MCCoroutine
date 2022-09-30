@@ -2,7 +2,7 @@ package com.github.shynixn.mccoroutine.sponge
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import org.spongepowered.api.command.spec.CommandSpec
+import org.spongepowered.api.command.Command
 import org.spongepowered.api.event.Event
 import kotlin.coroutines.CoroutineContext
 
@@ -28,7 +28,7 @@ interface CoroutineSession {
     /**
      * Registers a suspend command executor.
      */
-    fun registerSuspendCommandExecutor(commandSpec: CommandSpec.Builder, commandExecutor: SuspendingCommandExecutor)
+    fun registerSuspendCommandExecutor(alias: String, command: Command.Builder = Command.builder(), commandExecutor: SuspendingCommandExecutor)
 
     /**
      * Registers a suspend listener.

@@ -6,21 +6,22 @@ import com.github.shynixn.mccoroutine.sponge.MCCoroutineExceptionEvent
 import com.github.shynixn.mccoroutine.sponge.SuspendingCommandExecutor
 import com.github.shynixn.mccoroutine.sponge.dispatcher.AsyncCoroutineDispatcher
 import com.github.shynixn.mccoroutine.sponge.dispatcher.MinecraftCoroutineDispatcher
+import com.github.shynixn.mccoroutine.sponge.extension.submit
 import com.github.shynixn.mccoroutine.sponge.service.CommandServiceImpl
 import com.github.shynixn.mccoroutine.sponge.service.EventServiceImpl
 import kotlinx.coroutines.*
 import org.spongepowered.api.Sponge
-import org.spongepowered.api.command.spec.CommandSpec
+import org.spongepowered.api.command.Command
 import org.spongepowered.api.event.Event
-import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.scheduler.Task
+import org.spongepowered.plugin.PluginContainer
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
 
 internal class CoroutineSessionImpl(private val plugin: PluginContainer) :
     CoroutineSession {
-    private val logger = Logger.getLogger("MCCoroutine-" + plugin.name)
+    private val logger = Logger.getLogger("MCCoroutine-" + plugin.metadata().name().get())
     private val eventService: EventServiceImpl by lazy {
         EventServiceImpl(plugin, logger)
     }
@@ -54,7 +55,7 @@ internal class CoroutineSessionImpl(private val plugin: PluginContainer) :
 
             Task.builder()
                 .execute(Runnable {
-                    Sponge.getEventManager().post(mcCoroutineExceptionEvent)
+                    Sponge.eventManager().post(mcCoroutineExceptionEvent)
 
                     if (!mcCoroutineExceptionEvent.isCancelled) {
                         if (e !is CancellationException) {
@@ -79,10 +80,11 @@ internal class CoroutineSessionImpl(private val plugin: PluginContainer) :
      * Registers a suspend command executor.
      */
     override fun registerSuspendCommandExecutor(
-        commandSpec: CommandSpec.Builder,
+        alias: String,
+        command: Command.Builder,
         commandExecutor: SuspendingCommandExecutor
     ) {
-        commandServiceImpl.registerSuspendCommandExecutor(commandSpec, commandExecutor)
+        commandServiceImpl.registerSuspendCommandExecutor(alias, command, commandExecutor)
     }
 
     /**
