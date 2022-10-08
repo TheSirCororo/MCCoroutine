@@ -152,7 +152,6 @@ subprojects {
 
     dependencies {
         testImplementation(kotlin("test"))
-        testImplementation(kotlin("test-junit"))
         testImplementation("org.mockito:mockito-core:4.8.0")
     }
 }

@@ -3,9 +3,7 @@ plugins {
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
+    version = JavaVersion.VERSION_1_8
 }
 
 repositories {

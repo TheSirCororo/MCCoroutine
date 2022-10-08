@@ -5,9 +5,7 @@ repositories {
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
+    version = JavaVersion.VERSION_1_8
 }
 
 dependencies {

@@ -20,15 +20,15 @@ import kotlinx.coroutines.withContext
     name = "MCCoroutineSample",
     description = "MCCoroutineSample is sample plugin to use MCCoroutine in Velocity."
 )
-class MCCoroutineSamplePlugin {
+class MCCoroutineSamplePlugin
+@Inject constructor(suspendingPluginContainer: SuspendingPluginContainer) {
     @Inject
     lateinit var proxyServer: ProxyServer
 
     @Inject
     lateinit var pluginContainer: PluginContainer
 
-    @Inject
-    constructor(suspendingPluginContainer: SuspendingPluginContainer) {
+    init {
         suspendingPluginContainer.initialize(this)
     }
 
