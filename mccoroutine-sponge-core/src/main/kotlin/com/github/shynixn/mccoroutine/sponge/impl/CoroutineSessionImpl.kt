@@ -13,6 +13,7 @@ import kotlinx.coroutines.*
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.Command
 import org.spongepowered.api.event.Event
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.plugin.PluginContainer
 import java.util.logging.Level
@@ -80,11 +81,12 @@ internal class CoroutineSessionImpl(private val plugin: PluginContainer) :
      * Registers a suspend command executor.
      */
     override fun registerSuspendCommandExecutor(
+        event: RegisterCommandEvent<Command.Parameterized>,
         alias: String,
         command: Command.Builder,
         commandExecutor: SuspendingCommandExecutor
     ) {
-        commandServiceImpl.registerSuspendCommandExecutor(alias, command, commandExecutor)
+        commandServiceImpl.registerSuspendCommandExecutor(event, alias, command, commandExecutor)
     }
 
     /**

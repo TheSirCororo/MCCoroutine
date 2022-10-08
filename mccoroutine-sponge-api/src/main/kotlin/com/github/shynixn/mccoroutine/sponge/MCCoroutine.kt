@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import org.spongepowered.api.command.Command
 import org.spongepowered.api.event.Event
 import org.spongepowered.api.event.EventManager
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent
 import org.spongepowered.plugin.PluginContainer
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
@@ -143,17 +144,18 @@ fun EventManager.postSuspending(
  * Registers an command executor with suspending function.
  * Does exactly the same as PluginCommand.setExecutor.
  */
-fun Command.Builder.suspendingExecutor(
+fun RegisterCommandEvent<Command.Parameterized>.registerSuspendingExecutor(
     alias: String,
     plugin: PluginContainer,
+    command: Command.Builder = Command.builder(),
     suspendingCommandExecutor: SuspendingCommandExecutor
-): Command.Builder {
+) {
     mcCoroutine.getCoroutineSession(plugin).registerSuspendCommandExecutor(
-        alias,
         this,
+        alias,
+        command,
         suspendingCommandExecutor
     )
-    return this
 }
 
 /**

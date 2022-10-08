@@ -1,5 +1,6 @@
 package com.github.shynixn.mccoroutine.sponge.extension
 
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.scheduler.ScheduledTask
 import org.spongepowered.api.scheduler.Task
@@ -10,7 +11,7 @@ import java.lang.reflect.Method
  * Internal reflection suspend.
  */
 internal suspend fun Method.invokeSuspend(obj: Any, vararg args: Any?): Any? =
-    kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn { cont ->
+    suspendCoroutineUninterceptedOrReturn { cont ->
         invoke(obj, *args, cont)
     }
 
@@ -19,7 +20,7 @@ internal suspend fun Method.invokeSuspend(obj: Any, vararg args: Any?): Any? =
  */
 internal val PluginContainer.isEnabled: Boolean
     get() {
-        return true
+        return Sponge.server().game().pluginManager().plugins().contains(this)
     }
 
 /**

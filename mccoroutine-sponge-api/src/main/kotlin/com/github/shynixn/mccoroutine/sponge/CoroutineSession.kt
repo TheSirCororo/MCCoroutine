@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import org.spongepowered.api.command.Command
 import org.spongepowered.api.event.Event
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -27,8 +28,10 @@ interface CoroutineSession {
 
     /**
      * Registers a suspend command executor.
+     *
+     * P.S. From Sponge API v8 commands can be registered only with [RegisterCommandEvent] listener
      */
-    fun registerSuspendCommandExecutor(alias: String, command: Command.Builder = Command.builder(), commandExecutor: SuspendingCommandExecutor)
+    fun registerSuspendCommandExecutor(event: RegisterCommandEvent<Command.Parameterized>, alias: String, command: Command.Builder = Command.builder(), commandExecutor: SuspendingCommandExecutor)
 
     /**
      * Registers a suspend listener.
