@@ -1,5 +1,6 @@
 package com.github.shynixn.mccoroutine.bungeecord.extension
 
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import net.md_5.bungee.api.plugin.Plugin
 import java.lang.reflect.Method
 
@@ -15,7 +16,7 @@ internal val Plugin.isEnabled : Boolean
  * Internal reflection suspend.
  */
 internal suspend fun Method.invokeSuspend(obj: Any, vararg args: Any?): Any? =
-    kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn { cont ->
+    suspendCoroutineUninterceptedOrReturn { cont ->
         invoke(obj, *args, cont)
     }
 

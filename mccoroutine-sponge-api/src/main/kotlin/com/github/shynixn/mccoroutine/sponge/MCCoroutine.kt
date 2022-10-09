@@ -2,10 +2,13 @@ package com.github.shynixn.mccoroutine.sponge
 
 import kotlinx.coroutines.*
 import org.spongepowered.api.command.Command
+import org.spongepowered.api.command.parameter.CommandContext
+import org.spongepowered.api.command.parameter.Parameter
 import org.spongepowered.api.event.Event
 import org.spongepowered.api.event.EventManager
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent
 import org.spongepowered.plugin.PluginContainer
+import java.util.*
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 
@@ -170,6 +173,9 @@ val Int.ticks: Long
     get() {
         return (this * 50L - 25)
     }
+
+inline fun <reified T : Any> CommandContext.getOne(name: String): Optional<T> =
+    one(Parameter.key(name, T::class.java))
 
 interface MCCoroutine {
     /**

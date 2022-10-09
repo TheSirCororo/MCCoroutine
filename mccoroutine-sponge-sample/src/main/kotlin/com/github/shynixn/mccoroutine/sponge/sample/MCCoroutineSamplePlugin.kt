@@ -7,33 +7,28 @@ import com.github.shynixn.mccoroutine.sponge.sample.impl.UserDataCache
 import com.github.shynixn.mccoroutine.sponge.sample.listener.EntityInteractListener
 import com.github.shynixn.mccoroutine.sponge.sample.listener.PlayerConnectListener
 import com.google.inject.Inject
-import jdk.javadoc.internal.doclets.toolkit.taglets.ParamTaglet
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.Command
-import org.spongepowered.api.command.CommandExecutor
 import org.spongepowered.api.command.parameter.Parameter
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.lifecycle.LoadedGameEvent
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent
 import org.spongepowered.plugin.PluginContainer
-import org.spongepowered.plugin.Plugin
+import org.spongepowered.plugin.builtin.jvm.Plugin
 
 @Suppress("unused")
-@Plugin(
-    id = "mccoroutinesample",
-    name = "MCCoroutineSample",
-    description = "MCCoroutineSample is sample plugin to use MCCoroutine in Sponge."
-)
+@Plugin("mccoroutinesample")
 class MCCoroutineSamplePlugin {
     @Inject
     private lateinit var plugin: PluginContainer
 
     @Inject
     private lateinit var suspendingPluginContainer: SuspendingPluginContainer
-    val database = FakeDatabase()
-    val cache = UserDataCache(plugin, database)
+
+    private val database = FakeDatabase()
+    private val cache = UserDataCache(plugin, database)
 
     /**
      * OnEnable.
@@ -51,18 +46,6 @@ class MCCoroutineSamplePlugin {
         // Extension to traditional registration.
         Sponge.eventManager().registerSuspendingListeners(plugin, PlayerConnectListener(plugin, cache))
         Sponge.eventManager().registerSuspendingListeners(plugin, EntityInteractListener(cache))
-        val commandSpec = Command.builder()
-            .shortDescription(Component.text("Command for operations."))
-            .permission("mccoroutine.sample")
-            .addParameters(
-                GenericArguments.onlyOne(
-                    AdminCommandExecutor.SetCommandParameter(plugin, Text.of("action")).toCommandElement()
-                ),
-                GenericArguments.onlyOne(GenericArguments.player(Text.of("player"))),
-                GenericArguments.onlyOne(GenericArguments.integer(Text.of("kills")))
-            )
-            .ex(plugin, AdminCommandExecutor(cache, plugin))
-        Sponge.server().commandManager().registrar(CommandExecutor::class.java).get().plugin, commandSpec.build(), listOf("mccor"))
     }
 
     @Listener
@@ -72,12 +55,13 @@ class MCCoroutineSamplePlugin {
             .permission("mccoroutine.sample")
             .addParameters(
                 Parameter.subcommand(
-                    AdminCommandExecutor.SetCommandParameter(plugin, Text.of("action")).toParameter()
+                    AdminCommandExecutor.SetCommandParameter(plugin, Component.text("action")).toParameter(),
+                    "action"
                 ),
                 Parameter.player().key("player").build(),
                 Parameter.integerNumber().key("kills").build()
             )
 
-        event.registerSuspendingExecutor("mccor", plugin, commandBuilder, AdminCommandExecutor(cache, database))
+        event.registerSuspendingExecutor("mccor", plugin, commandBuilder, AdminCommandExecutor(cache, plugin))
     }
 }

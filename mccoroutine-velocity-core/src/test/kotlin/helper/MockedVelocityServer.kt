@@ -29,11 +29,7 @@ class MockedVelocityServer {
     lateinit var proxyServer: ProxyServer
 
     fun boot(mlogger: Logger? = null): PluginContainer {
-        val logger = if (mlogger == null) {
-            Mockito.mock(org.slf4j.Logger::class.java)
-        } else {
-            mlogger
-        }
+        val logger = mlogger ?: Mockito.mock(org.slf4j.Logger::class.java)
         val server = Mockito.mock(ProxyServer::class.java)
         val pluginManager = Mockito.mock(PluginManager::class.java)
         val eventManager = VelocityEventManager(pluginManager)
