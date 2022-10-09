@@ -40,7 +40,7 @@ tasks.register("printVersion") {
 
 subprojects {
     group = "com.github.shynixn.mccoroutine"
-    version = "2.5.0"
+    version = "2.6.0"
 
     apply(plugin = "kotlin")
     apply(plugin = "signing")
