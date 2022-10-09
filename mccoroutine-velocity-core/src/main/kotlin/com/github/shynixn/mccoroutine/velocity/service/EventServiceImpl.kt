@@ -124,7 +124,7 @@ class EventServiceImpl(
             }
 
             val untargetedHandler = loadingCacheClassGetMethod.invoke(unTargetedMethodHandlers, method)
-            val handler = buildHandlerMethod.invoke(untargetedHandler, listener) as EventHandler<Any>
+            val handler = buildHandlerMethod.invoke(untargetedHandler, listener) as EventHandler<*>
             val handlerRegistration =
                 handlerRegistrationClassConstructor.newInstance(pluginContainer, order, eventType, listener, handler)
 

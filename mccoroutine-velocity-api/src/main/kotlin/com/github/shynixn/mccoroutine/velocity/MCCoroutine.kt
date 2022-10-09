@@ -108,14 +108,14 @@ fun <S, T : ArgumentBuilder<S, T>> ArgumentBuilder<S, T>.executesSuspend(
     val scope = session.scope
     val dispatcher = session.dispatcherVelocity
 
-    val result = this.executes({ commandContext ->
+    val result = this.executes { commandContext ->
         // Start unDispatched on the same thread but end up on the velocity dispatcher.
         scope.launch(dispatcher, CoroutineStart.UNDISPATCHED) {
             command.invoke(commandContext)
         }
 
         com.mojang.brigadier.Command.SINGLE_SUCCESS
-    })!!
+    }!!
 
     return result
 }

@@ -7,7 +7,7 @@ import com.velocitypowered.api.plugin.PluginContainer
  * A Velocity event which is called when an exception is raised in one of the coroutines managed by MCCoroutine.
  * Cancelling this exception causes the error to not get logged and offers to possibility for custom logging.
  */
-class MCCoroutineExceptionEvent(
+data class MCCoroutineExceptionEvent(
     /**
      * Plugin causing the exception.
      */

@@ -55,7 +55,7 @@ internal class CommandServiceImpl(
                 completableFuture.complete(result.toMutableList())
             }
 
-            return completableFuture;
+            return completableFuture
         }
 
         /**

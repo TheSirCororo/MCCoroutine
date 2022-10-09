@@ -1,7 +1,6 @@
 package com.github.shynixn.mccoroutine.velocity
 
 import com.google.common.collect.ImmutableList
-import com.velocitypowered.api.command.Command
 import com.velocitypowered.api.command.CommandInvocation
 
 interface SuspendInvocableCommand<I : CommandInvocation<*>> {

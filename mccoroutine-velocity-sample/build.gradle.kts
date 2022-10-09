@@ -7,7 +7,7 @@ java {
 }
 
 repositories {
-    maven("https://nexus.velocitypowered.com/repository/maven-public")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 tasks {
@@ -26,10 +26,10 @@ dependencies {
     implementation(project(":mccoroutine-velocity-core"))
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
 
-    compileOnly("com.velocitypowered:velocity-api:3.0.1")
-    kapt("com.velocitypowered:velocity-api:3.0.1")
-    testCompileOnly("com.velocitypowered:velocity-api:3.0.1")
+    compileOnly("com.velocitypowered:velocity-api:3.1.1")
+    kapt("com.velocitypowered:velocity-api:3.1.1")
+    testCompileOnly("com.velocitypowered:velocity-api:3.1.1")
 }
